@@ -2,6 +2,35 @@ const Liderado = require("../models/Liderado");
 const Igreja = require("../models/Igreja");
 const mongoose = require("mongoose");
 
+exports.criarLiderado = async (req, res) => {
+  try {
+    const { nome } = req.body;
+    let { igrejaId } = req.body;
+
+    // Segurança: se for líder LOCAL, forçamos o ID da igreja dele vindo do Token/User
+    if (req.user.tipo === "LOCAL") {
+      igrejaId = req.user.igrejaId;
+    }
+
+    if (!nome || !igrejaId) {
+      return res.status(400).json({ error: "Nome e Igreja são obrigatórios." });
+    }
+
+    const novoLiderado = await Liderado.create({
+      nome,
+      igrejaId,
+      criadoPor: req.user._id,
+    });
+
+    res.status(201).json(novoLiderado);
+  } catch (error) {
+    console.error("Erro ao salvar liderado:", error);
+    res
+      .status(400)
+      .json({ error: "Erro ao salvar: verifique se o ID da igreja é válido." });
+  }
+};
+
 exports.listarLiderados = async (req, res) => {
   try {
     let filtro = {};

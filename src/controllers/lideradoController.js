@@ -26,8 +26,13 @@ exports.listarLiderados = async (req, res) => {
 
     // 3. Se for DIRETORIA, o filtro continua vazio {}, trazendo tudo.
 
+    // No seu Liderado.find(filtro)...
     const liderados = await Liderado.find(filtro)
-      .populate("igrejaId", "nome regionalId")
+      .populate({
+        path: "igrejaId",
+        select: "nome regionalId",
+        populate: { path: "regionalId", select: "nome" }, // Traz o nome da regional também
+      })
       .populate("criadoPor", "nome email tipo");
 
     // Retornamos um formato padronizado

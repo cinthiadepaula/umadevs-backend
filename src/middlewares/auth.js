@@ -8,9 +8,17 @@ module.exports = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, "SEGREDO_SUPER_FORTE");
+    // Se o seu token vier com "Bearer ", remova:
+    const tokenFormatado = token.startsWith("Bearer ")
+      ? token.split(" ")[1]
+      : token;
 
-    req.user = decoded; // 👈 aqui fica o usuário logado
+    const decoded = jwt.verify(tokenFormatado, "SEGREDO_SUPER_FORTE");
+
+    req.user = decoded;
+
+    // Debug crucial: Veja se o regionalId aparece aqui no log do Render
+    console.log("DADOS NO TOKEN:", req.user);
 
     next();
   } catch (error) {

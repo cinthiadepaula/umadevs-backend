@@ -1,4 +1,5 @@
 const Liderado = require("../models/Liderado");
+const Igreja = require("../models/Igreja");
 
 exports.criarLiderado = async (req, res) => {
   try {
@@ -35,6 +36,16 @@ exports.listarLiderados = async (req, res) => {
 
     if (req.user.tipo === "LOCAL") {
       filtro.igrejaId = req.user.igrejaId;
+    }
+
+    if (req.user.tipo === "REGIONAL") {
+      const igrejas = await Igreja.find({
+        regionalId: req.user.regionalId,
+      });
+
+      const igrejasIds = igrejas.map((igreja) => igreja._id);
+
+      filtro.igrejaId = { $in: igrejasIds };
     }
 
     const liderados = await Liderado.find(filtro)

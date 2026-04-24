@@ -17,7 +17,14 @@ exports.criarIgreja = async (req, res) => {
 
 exports.listarIgrejas = async (req, res) => {
   try {
-    const igrejas = await Igreja.find().populate("regionalId", "nome");
+    let filtro = {};
+
+    if (req.user.tipo === "REGIONAL") {
+      filtro.regionalId = req.user.regionalId;
+    }
+
+    const igrejas = await Igreja.find(filtro).populate("regionalId", "nome");
+
     res.json(igrejas);
   } catch (error) {
     res.status(500).json({ error: "Erro ao listar igrejas" });

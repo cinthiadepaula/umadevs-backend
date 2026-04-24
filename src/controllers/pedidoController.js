@@ -27,10 +27,14 @@ exports.listarPedidos = async (req, res) => {
       filtro.liderId = { $in: lideresIds };
     }
 
-    const pedidos = await Pedido.find(filtro).populate(
-      "liderId",
-      "nome email tipo igrejaId regionalId",
-    );
+    const pedidos = await Pedido.find(filtro).populate({
+      path: "liderId",
+      select: "nome email tipo igrejaId regionalId",
+      populate: {
+        path: "igrejaId",
+        select: "nome regionalId",
+      },
+    });
 
     res.json(pedidos);
   } catch (error) {

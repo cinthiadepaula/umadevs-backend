@@ -43,12 +43,13 @@ exports.login = async (req, res) => {
       return res.status(400).json({ error: "Senha inválida" });
     }
 
+    // No seu controller de Login
     const token = jwt.sign(
       {
         id: user._id,
-        tipo: user.tipo,
-        igrejaId: user.igrejaId,
-        regionalId: user.regionalId,
+        tipo: user.tipo, // Importante!
+        regionalId: user.regionalId, // Importante!
+        igrejaId: user.igrejaId, // Importante!
       },
       "SEGREDO_SUPER_FORTE",
       { expiresIn: "1d" },

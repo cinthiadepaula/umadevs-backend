@@ -9,6 +9,8 @@ const lideradoRoutes = require("./src/routes/lideradoRoutes");
 const regionalRoutes = require("./src/routes/regionalRoutes");
 const igrejaRoutes = require("./src/routes/igrejaRoutes");
 const pedidosRoutes = require("./src/routes/pedidosRoutes");
+const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 
 const app = express();
 
@@ -26,6 +28,7 @@ app.get("/", (req, res) => {
   res.send("API rodando 🚀");
 });
 
+setupSwagger(app);
 app.get("/teste", async (req, res) => {
   try {
     const users = await User.find();
@@ -45,3 +48,36 @@ app.get("/privado", auth, (req, res) => {
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Servidor rodando na porta ${process.env.PORT || 3000}`);
 });
+
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: "3.0.0",
+    info: {
+      title: "API UMADEVS",
+      version: "1.0.0",
+      description: "Documentação do sistema de Liderados e Pedidos",
+      contact: {
+        name: "Desenvolvedor",
+      },
+      servers: [{ url: "https://umadevs-backend.onrender.com" }], // Sua URL do Render
+    },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [{ bearerAuth: [] }],
+  },
+  // Caminho para os arquivos que contêm as anotações (Ex: suas rotas)
+  apis: ["./src/routes/*.js"],
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+
+module.exports = (app) => {
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+};
